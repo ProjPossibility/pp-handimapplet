@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+<ModulePrefs 	
+	title="Parking Search"              
+	description="Displays a Hello World message in the left panel"             
+	author="Your name"            
+	author_email="your-email@gmail.com"
+	height="150">
+	<Require feature="sharedmap" /> 
+</ModulePrefs>
+<Content type="html">
+<![CDATA[
+
+<h2>Handicapped Parking Finder</h2>
+
+<div>
+<div style="padding-top:.25em; background-color: #e5ecf9;">
+<style>
+.headertable{padding:0px 5px 5px 5px;width:300px;}
+.headerrow{font-size:8pt;padding:0px 0px 0px 5px;}
+.disabled{color:gray;}
+</style>
+<table border=0 cellspacing="0" cellpadding="0" class="headertable">
+<form onsubmit="doSearch(); return false;" style="margin-bottom: 4px; padding: 0px; border:0px">
+<tr class="headerrow">
+
+
+<td colspan=2>Location &nbsp; <span style="color: gray">e.g., zip, address, city </span></td>
+</tr>
+<tr>
+<td>
+<input id="location" name="location" value="" style="width: 180px">
+</td>
+<td><input type=submit value="Search"></td>
+</tr>
+</table>
+</form>
+</div>
+
+<script>
+var map = new GMap2();
+var geocoder = new GClientGeocoder();
+
+function centerAddress(address) 
+{
+	geocoder.getLatLngAsync(address,    
+		function(latlng) 
+		{
+			if (!latlng)
+			{
+				alert(address + " not found");
+			}
+			else
+			{
+				map.setCenter(latlng, 14);
+			}
+		}
+	);
+}
+
+function markAddress(address)
+{
+	geocoder.getLatLngAsync(address,    
+		function(latlng) 
+		{
+			if (!latlng)
+			{
+				alert(address + " not found");
+			}
+			else
+			{
+				var marker = new GMarker(latlng);
+				map.addOverlay(marker);
+				marker.openInfoWindowHtml(address);
+			}
+		}
+	);
+}
+
+function doSearch()
+{
+	var address= document.getElementById('location').value;
+	centerAddress(address);
+	getLocations(address);
+	
+}
+
+function getLocations(zip)
+{
+	var url = "http://projectpossibility.org/svn/handicapmapplet/source/data.xml";
+	_IG_FetchXmlContent(url,
+		function(response)
+		{
+			var locations = response.getElementsByTagName("location");
+			for(var i = 0 ; i < locations.length; i++)
+			{
+				var location = locations.item(i);
+				alert(location.firstChild.nodeValue);
+				if(location.getAttribute("zip") == zip)
+				{
+					var streetNum = location.getAttribute("streetNum");
+					var street = location.getAttribute("street");
+					var city= location.getAttribute("city");
+					var state = location.getAttribute("state");
+					var address = streetNum + " " + street + " " + city + " " + state + " " + zip;
+					markAddress(address);
+				}
+			}
+		}
+	);
+}
+
+</script>
+
+
+]]>
+</Content>
+</Module>
+
+
+
+
+
+
+
+
+
+
+
+
