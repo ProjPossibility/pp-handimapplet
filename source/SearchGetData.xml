@@ -95,7 +95,7 @@ function getLocations(zip)
 			for(var i = 0 ; i < locations.length; i++)
 			{
 				var location = locations.item(i);
-				alert(location.firstChild.nodeValue);
+				alert(location.firstChild.nodeValue + " " + location.getAttribute("zip"));
 				if(location.getAttribute("zip") == zip)
 				{
 					var streetNum = location.getAttribute("streetNum");
