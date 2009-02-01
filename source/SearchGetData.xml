@@ -126,8 +126,9 @@ function doSearch()
 	getLocations(zip);
 }
 
-function getLocations(zip)
+function getLocations(zipcode)
 {
+	var zip = zipcode.replace(/^\s+|\s+$/, '');
 	var url = "http://projectpossibility.org/projects/a11ymapplet/googlemappletT.php?operation=search&zipcode=" + zip;
 	_IG_FetchXmlContent(url,
 		function(response)
