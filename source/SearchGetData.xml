@@ -24,18 +24,18 @@ by <a target="_blank" href="http://www.projectpossibility.org/">Project:Possibil
 	.headerrow{font-size:8pt;padding:0px 0px 0px 5px;}
 	.disabled{color:gray;}
 	</style>
-	<form onsubmit="doSearch(); return false;" style="margin-bottom: 4px; padding: 0px; border:0px">
+	<form style="margin-bottom: 4px; padding: 0px; border:0px">
 		<table border=0 cellspacing="0" cellpadding="0" class="headertable">
 			<tr class="headerrow">
-				<td colspan=2>Zip Code</td>
+				<td>Zip Code</td>
+				<td>Category</td>
 			</tr>
 			<tr>
-				<td><input id="zipcode" name="zipcode" value="" style="width: 180px"></td>
-			</tr>
-			<tr class="headerrow">
-				<td colspan=2>Keywords</td>
-			</tr>
-			<tr>
+				<td>
+					<input id="zipcode" name="zipcode" value="" style="width: 60px"
+					       onkeypress="{if(event.keyCode == 13) { doSearch(); return false; }}"
+					/>
+				</td>
 				<td>
 					<select id="category" name="category" onchange="changeCategory(this.value);">
 						<option value="" selected>Any</option>
@@ -50,7 +50,9 @@ by <a target="_blank" href="http://www.projectpossibility.org/">Project:Possibil
 						<option value="Other">Other</option>
 					</select>
 				</td>
-				<td><input type=submit value="Search"></td>
+				<td>
+					<input type=button onclick="doSearch(); return false;" value="Search"/>
+				</td>
 			</tr>
 		</table>
 	</form>
