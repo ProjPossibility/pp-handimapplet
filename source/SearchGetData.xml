@@ -67,8 +67,7 @@ var geocoder = new GClientGeocoder();
 var targetDiv = document.getElementById("resultsheader");
 var selectedCategory = "";
 var currentListing = 1;
-var totalResults = 0;
-var resultsPerPage = 2;
+var resultsPerPage = 10;
 
 function centerAddress(address)
 {
@@ -122,6 +121,7 @@ function doSearch()
 	targetDiv.innerHTML="";
 	markers = [];
 	allListings = [];
+	currentListing = 1;
 	var zip= document.getElementById('zipcode').value;
 	centerAddress(zip);
 	map.clearOverlays();
@@ -130,43 +130,45 @@ function doSearch()
 
 function getLocations(zip)
 {
-	var url = "http://projectpossibility.org/svn/handicapmapplet/source/data.xml";
+	var url = "http://projectpossibility.org/projects/a11ymapplet/googlemappletT.php?operation=search&zipcode=" + zip;
 	_IG_FetchXmlContent(url,
 		function(response)
 		{
-			var locations = response.getElementsByTagName("location");
-			for(var i = 0 ; i < locations.length; i++)
+			if(response.getElementsByTagName("locations"))
 			{
-				var location = locations.item(i);
-				if(location.getAttribute("zip") == zip)
+				var locations = response.getElementsByTagName("location");
+				for(var i=0; i < locations.length; i++)
 				{
+					var location = locations.item(i);
 					allListings.push(location);
 					var contents= formatInfoWindow(location);
-					markAddress(contents[0], contents[1]);
 				}
+				displayListings(allListings.slice(currentListing - 1,
+				currentListing + resultsPerPage - 1));
 			}
-			displayListings(allListings.slice(currentListing - 1,
-							    currentListing + resultsPerPage - 1));
 		},
 	{refreshInterval:0});
 }
 
 function formatInfoWindow(location)
 {
-	var zip = location.getAttribute("zip");
-	var streetNum = location.getAttribute("streetNum");
+	var zip = location.getAttribute("zipcode");
+	var streetNum = location.getAttribute("streetnumber");
 	var street = location.getAttribute("street");
 	var city= location.getAttribute("city");
 	var state = location.getAttribute("state");
-	var address = streetNum + " " + street + " " + city + " " + state + " " + zip;
-	var name = location.firstChild.nodeValue;
-	var numSpaces = 0;
-	var html = "<small><b>" +
-		name + "</b><br/>" +
-		streetNum + " " + street + ", " +
-		city + ", " + state + " " + zip + "<br/>" +
-		"<i>Handicap Parking Spaces: " + numSpaces +
-		"</i><br/></small>";
+	var address = (streetNum ? streetNum + " " : "") +
+			      (street ? street + ", " : "") +
+				  (city ? city + ", " : "") +
+				  (state ? state + " " : "") +
+				  (zip ? zip : "");
+	var name = "";
+	if(location.firstChild)
+		name = "<b>" + location.firstChild.nodeValue + "</b><br/>";
+
+	var numSpaces = location.getAttribute("parking");
+	var html = "<small>" + name + address + "<br/>" +
+		"<i>Handicap Parking Spaces: " + numSpaces + "</i><br/></small>";
 	var returnResults= new Array();
 	returnResults[0] = address;
 	returnResults[1] = html;
@@ -181,27 +183,61 @@ function displayListings(listings)
 	}
 	else
 	{
-		targetDiv.innerHTML += "<small><b>Found " + listings.length +
+		targetDiv.innerHTML += "<small><b>Found " + allListings.length +
 							   " results.</b></small><br/><br/>";
-		for(var i = 0 ; i < listings.length ; i++)
+		for(var i=0 ; i < listings.length; i++)
 		{
 			var listing = formatInfoWindow(listings[i]);
+			markAddress(listing[0], listing[1]);
 			targetDiv.innerHTML +=
 				"<a href=\"#\" onclick=\"showInfoWindow(" + i + ", " +
 				listing[1] + "); return false;\" >" + listing[1] +
 				"</a><br/>";
 		}
 
-		if(listings.length < allListings.length)
-		{
-			var previous = "<a href=\"#\">previous</a>";
-			var next = "<a href=\"#\">next</a>";
-			targetDiv.innerHTML +=
-				"<small>" + previous + " Results: " + currentListing + "-" +
-				(currentListing + resultsPerPage - 1) + " of " +
-				allListings.length + " " + next + "</small>";
-		}
+		var previous = (canGoPrevious() ?
+			'<a href="#" onclick="prevPage(); return false;">previous</a>' :
+			'<span class=disabled>previous</span>');
+		var next = (canGoNext() ?
+			'<a href="#" onclick="nextPage(); return false;">next</a>' :
+			'<span class=disabled>next</span>');
+
+		var ending = Math.min(currentListing + resultsPerPage - 1, allListings.length);
+		targetDiv.innerHTML +=
+			"<small>" + previous + " " + currentListing + "-" +
+			ending + " of " + allListings.length + " " + next + "</small>";
 	}
+}
+
+function nextPage()
+{
+	currentListing += resultsPerPage;
+	map.clearOverlays();
+	targetDiv.innerHTML = "";
+	displayListings(allListings.slice(currentListing-1,
+								      currentListing-1 + resultsPerPage));
+}
+
+function prevPage()
+{
+	currentListing -= resultsPerPage;
+	if(currentListing <= 0)
+		currentListing = 1;
+
+	map.clearOverlays();
+	targetDiv.innerHTML = "";
+	displayListings(allListings.slice(currentListing-1,
+								      currentListing-1 + resultsPerPage));
+}
+
+function canGoPrevious()
+{
+	return currentListing > 1;
+}
+
+function canGoNext()
+{
+	return (currentListing + resultsPerPage) <= allListings.length;
 }
 
 function showInfoWindow(index, html)
