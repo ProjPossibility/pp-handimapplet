@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding = "UTF-8" ?>
 <locations>
-	<location zipcode="90024" city="los angeles" street="gayley ave" streetnumber="1050" state="CA" parking=0>Whole Foods</location>
-	<location zipcode="90024" city="los angeles" street="westwood blvd" streetnumber="1515" state="CA" parking=0>Bristol Farms</location>
-	<location zipcode="92609" city="Laguna Hills" street="La Paz Rd" streetnumber="27871" state="CA" parking=0>Ralphs</location>
-	<location zipcode="90024" city="los angeles" street="westwood blvd" streetnumber="1400" state="CA" parking=0>711</location>
-	<location zipcode="90024" city="los angeles" street="westwood blvd" streetnumber="921" state="CA" parking=0>Farmers Market</location>
+	<location zipcode="90024" city="los angeles" street="gayley ave" streetnumber="1050" state="CA" parking="0">Whole Foods</location>
+	<location zipcode="90024" city="los angeles" street="westwood blvd" streetnumber="1515" state="CA" parking="0">Bristol Farms</location>
+	<location zipcode="92609" city="Laguna Hills" street="La Paz Rd" streetnumber="27871" state="CA" parking="0">Ralphs</location>
+	<location zipcode="90024" city="los angeles" street="westwood blvd" streetnumber="1400" state="CA" parking="0">711</location>
+	<location zipcode="90024" city="los angeles" street="westwood blvd" streetnumber="921" state="CA" parking="0">Farmers Market</location>
 </locations>
