@@ -73,7 +73,12 @@ function markAddress(address, infoWindow)
 			}
 			else
 			{
-				var marker = new GMarker(latlng);
+				var markerimg = "http://www.clipartguide.com/_small/0808-0806-1217-1556.jpg";
+				var icon = new GIcon(G_DEFAULT_ICON, markerimg);
+				icon.iconSize=new GSize(30,30);
+				//icon.iconAnchor=new GPoint(14,40);
+				icon.shadowSize=new GSize(0, 0);
+				var marker = new GMarker(latlng, {icon:icon});
 				map.addOverlay(marker);
 				GEvent.addListener(marker, "click", 
 					function()
@@ -91,6 +96,7 @@ function doSearch()
 	var address= document.getElementById('location').value;
 	centerAddress(address);
 	map.clearOverlays();
+	resultheader.innerHTML="";
 	getLocations(address);
 	
 }
