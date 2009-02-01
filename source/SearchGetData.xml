@@ -8,52 +8,53 @@
 	height="150">
 	<Require feature="sharedmap" />
 </ModulePrefs>
+
 <Content type="html">
 <![CDATA[
 
-<h2>Handicapped Parking Finder</h2>
-
+<b>Handicapped Parking Finder</b><br/>
+<small>
+by <a target="_blank" href="http://www.projectpossibility.org/">Project:Possibility</a>
+<br/><br/>
+</small>
 <div>
-<div style="padding-top:.25em; background-color: #e5ecf9;">
-<style>
-.headertable{padding:0px 5px 5px 5px;width:300px;}
-.headerrow{font-size:8pt;padding:0px 0px 0px 5px;}
-.disabled{color:gray;}
-</style>
-<table border=0 cellspacing="0" cellpadding="0" class="headertable">
-<form onsubmit="doSearch(); return false;" style="margin-bottom: 4px; padding: 0px; border:0px">
-<tr class="headerrow">
-<td colspan=2>Zip Code</td>
-</tr>
-<tr>
-<td>
-<input id="zipcode" name="zipcode" value="" style="width: 180px">
-</td>
-</tr>
-<tr class="headerrow">
-<td colspan=2>Keywords</td>
-</tr>
-<tr>
-<td>
-<select id="category" name="category" onchange="changeCategory(this.value);">
-<option value="" selected>Any</option>
-<option value="Entertainment">Entertainment</option>
-<option value="Food">Food</option>
-<option value="Government Facility">Government Facilities</option>
-<option value="Medical">Medical</option>
-<option value="Office">Office</option>
-<option value="Recreation">Recreation</option>
-<option value="School">School</option>
-<option value="Shopping">Shopping</option>
-<option value="Other">Other</option>
-</select>
-</td>
-<td><input type=submit value="Search"></td>
-</tr>
-</table>
-</form>
+	<div style="background-color: #e5ecf9;">
+	<style>
+	.headertable{padding:0px 5px 5px 5px;width:300px;}
+	.headerrow{font-size:8pt;padding:0px 0px 0px 5px;}
+	.disabled{color:gray;}
+	</style>
+	<form onsubmit="doSearch(); return false;" style="margin-bottom: 4px; padding: 0px; border:0px">
+		<table border=0 cellspacing="0" cellpadding="0" class="headertable">
+			<tr class="headerrow">
+				<td colspan=2>Zip Code</td>
+			</tr>
+			<tr>
+				<td><input id="zipcode" name="zipcode" value="" style="width: 180px"></td>
+			</tr>
+			<tr class="headerrow">
+				<td colspan=2>Keywords</td>
+			</tr>
+			<tr>
+				<td>
+					<select id="category" name="category"onchange="changeCategory(this.value);">
+						<option value="" selected>Any</option>
+						<option value="Entertainment">Entertainment</option>
+						<option value="Food">Food</option>
+						<option value="Government Facility">Government Facilities</option>
+						<option value="Medical">Medical</option>
+						<option value="Office">Office</option>
+						<option value="Recreation">Recreation</option>
+						<option value="School">School</option>
+						<option value="Shopping">Shopping</option>
+						<option value="Other">Other</option>
+					</select>
+				</td>
+				<td><input type=submit value="Search"></td>
+			</tr>
+		</table>
+	</form>
 </div>
-
 <div id="resultsheader"></div>
 
 <script>
@@ -167,39 +168,39 @@ function formatInfoWindow(location)
 
 function displayListings(listings)
 {
-	try{
-		if(!listings || listings.length==0)
+	if(!listings || listings.length==0)
+	{
+		targetDiv.innerHTML += "<small><b>Sorry, nothing found.</b></small>";
+	}
+	else
+	{
+		targetDiv.innerHTML += "<small><b>Found " + listings.length +
+							   " results.</b></small><br/><br/>";
+		for(var i = 0 ; i < listings.length ; i++)
 		{
-			targetDiv.innerHTML += "<small><b>Sorry, nothing found</b></small>";
+			var listing = formatInfoWindow(listings[i]);
+			targetDiv.innerHTML +=
+				"<a href=\"#\" onclick=\"showInfoWindow(" + i + ", " +
+				listing[1] + "); return false;\" >" + listing[1] +
+				"</a><br/>";
 		}
-		else
-		{
-			targetDiv.innerHTML += "<small><b>Found " + listings.length + " results.</b></small><br/><br/>";
-			for(var i = 0 ; i < listings.length ; i++)
-			{
-				var listing = formatInfoWindow(listings[i]);
-				targetDiv.innerHTML += "<a href=\"#\" onclick=\"showInfoWindow(" +
-									   i + ", " + listing[1] + "); return false;\" >" +
-									   listing[1] + "</a><br/>";
-			}
-		}
-	} catch(error) {
-		alert("Error in displayListings: " + error);
 	}
 }
 
 function showInfoWindow(index, html)
 {
-	GEvent.trigger(markers[index], "click");
+	try {
+		GEvent.trigger(markers[index], "click");
+	} catch(error) {
+		alert("Error in showInfoWindow(): " + error);
+	}
 }
 
 function changeCategory(value)
 {
 	selectedCategory=value;
 }
-
 </script>
-
 
 ]]>
 </Content>
