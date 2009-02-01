@@ -71,7 +71,7 @@ function centerAddress(address)
 		{
 			if (!latlng)
 			{
-				alert(address + " not found");
+				alert("Please enter a valid zipcode.");
 			}
 			else
 			{
@@ -88,7 +88,7 @@ function markAddress(address, infoWindow)
 		{
 			if (!latlng)
 			{
-				alert(address + " not found");
+				alert("Please enter a valid zipcode.");
 			}
 			else
 			{
