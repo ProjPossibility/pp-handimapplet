@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Module>
-<ModulePrefs 	
-	title="Parking Search"              
-	description="Displays a Hello World message in the left panel"             
-	author="Your name"            
+<ModulePrefs
+	title="Parking Search"
+	description="Displays a Hello World message in the left panel"
+	author="Your name"
 	author_email="your-email@gmail.com"
 	height="150">
-	<Require feature="sharedmap" /> 
+	<Require feature="sharedmap" />
 </ModulePrefs>
 <Content type="html">
 <![CDATA[
@@ -31,7 +31,7 @@
 </td>
 </tr>
 <tr class="headerrow">
-<td colspan=2>Keywords</td> 
+<td colspan=2>Keywords</td>
 </tr>
 <tr>
 <td>
@@ -64,10 +64,10 @@ var geocoder = new GClientGeocoder();
 var targetDiv = document.getElementById("resultsheader");
 var selectedCategory = "";
 
-function centerAddress(address) 
+function centerAddress(address)
 {
-	geocoder.getLatLngAsync(address,    
-		function(latlng) 
+	geocoder.getLatLngAsync(address,
+		function(latlng)
 		{
 			if (!latlng)
 			{
@@ -83,8 +83,8 @@ function centerAddress(address)
 
 function markAddress(address, infoWindow)
 {
-	geocoder.getLatLngAsync(address,    
-		function(latlng) 
+	geocoder.getLatLngAsync(address,
+		function(latlng)
 		{
 			if (!latlng)
 			{
@@ -99,7 +99,7 @@ function markAddress(address, infoWindow)
 				icon.shadowSize=new GSize(0, 0);
 				var marker = new GMarker(latlng, {icon:icon});
 				map.addOverlay(marker);
-				GEvent.addListener(marker, "click", 
+				GEvent.addListener(marker, "click",
 					function()
 					{
 						marker.openInfoWindowHtml(infoWindow);
@@ -111,7 +111,7 @@ function markAddress(address, infoWindow)
 }
 
 function doSearch()
-{	
+{
 	targetDiv.innerHTML="";
 	var zip= document.getElementById('zipcode').value;
 	centerAddress(zip);
@@ -139,7 +139,7 @@ function getLocations(zip)
 			}
 			displayListings(listings);
 		},
-	{refreshInterval:0});	
+	{refreshInterval:0});
 }
 
 function formatInfoWindow(location)
@@ -152,7 +152,7 @@ function formatInfoWindow(location)
 	var address = streetNum + " " + street + " " + city + " " + state + " " + zip;
 	var name = location.firstChild.nodeValue;
 	var numSpaces = 0;
-	var html = "<small><b>" + 
+	var html = "<small><b>" +
 		name + "</b><br>" +
 		streetNum + " " + street + ", " +
 		city + ", " + state + " " + zip + "<br/>" +
@@ -166,18 +166,22 @@ function formatInfoWindow(location)
 
 function displayListings(listings)
 {
-	if(!listings || listings.length==0)
-	{
-		targetDiv += "<small><b>Sorry, nothing found</b></small>";
-	}
-	else
-	{
-		targetDiv.innerHTML += "<small><b>Found " + listings.length + " results.</b></small><br/><br/>";
-		for(var i = 0 ; i < listings.length ; i++)
+	try{
+		if(!listings || listings.length==0)
 		{
-			var listing = formatInfoWindow(listings[i]);
-			targetDiv.innerHTML += listing[1] + "<br/>";
+			targetDiv.innerHTML += "<small><b>Sorry, nothing found</b></small>";
 		}
+		else
+		{
+			targetDiv.innerHTML += "<small><b>Found " + listings.length + " results.</b></small><br/><br/>";
+			for(var i = 0 ; i < listings.length ; i++)
+			{
+				var listing = formatInfoWindow(listings[i]);
+				targetDiv.innerHTML += listing[1] + "<br/>";
+			}
+		}
+	} catch(error) {
+		alert("Error in displayListings: " + error);
 	}
 }
 
