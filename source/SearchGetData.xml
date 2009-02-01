@@ -23,13 +23,30 @@
 <table border=0 cellspacing="0" cellpadding="0" class="headertable">
 <form onsubmit="doSearch(); return false;" style="margin-bottom: 4px; padding: 0px; border:0px">
 <tr class="headerrow">
-
-
-<td colspan=2>Location &nbsp; <span style="color: gray">e.g., zip, address, city </span></td>
+<td colspan=2>Zip Code</td>
 </tr>
 <tr>
 <td>
-<input id="location" name="location" value="" style="width: 180px">
+<input id="zipcode" name="zipcode" value="" style="width: 180px">
+</td>
+</tr>
+<tr class="headerrow">
+<td colspan=2>Keywords</td> 
+</tr>
+<tr>
+<td>
+<select id="category" name="category" onchange="changeCategory(this.value);">
+<option value="" selected>Any</option>
+<option value="Entertainment">Entertainment</option>
+<option value="Food">Food</option>
+<option value="Government Facility">Government Facilities</option>
+<option value="Medical">Medical</option>
+<option value="Office">Office</option>
+<option value="Recreation">Recreation</option>
+<option value="School">School</option>
+<option value="Shopping">Shopping</option>
+<option value="Other">Other</option>
+</select>
 </td>
 <td><input type=submit value="Search"></td>
 </tr>
@@ -44,6 +61,8 @@
 <script>
 var map = new GMap2();
 var geocoder = new GClientGeocoder();
+var targetDiv = document.getElementById("resultsheader");
+var selectedCategory = "";
 
 function centerAddress(address) 
 {
@@ -73,10 +92,10 @@ function markAddress(address, infoWindow)
 			}
 			else
 			{
-				var markerimg = "http://www.clipartguide.com/_small/0808-0806-1217-1556.jpg";
+				var markerimg = "http://ss12.info/image/sponsor/logo_projpos_large.jpg";
 				var icon = new GIcon(G_DEFAULT_ICON, markerimg);
-				icon.iconSize=new GSize(30,30);
-				//icon.iconAnchor=new GPoint(14,40);
+				icon.iconSize=new GSize(25,25);
+				icon.iconAnchor=new GPoint(14,40);
 				icon.shadowSize=new GSize(0, 0);
 				var marker = new GMarker(latlng, {icon:icon});
 				map.addOverlay(marker);
@@ -92,13 +111,12 @@ function markAddress(address, infoWindow)
 }
 
 function doSearch()
-{
-	var address= document.getElementById('location').value;
-	centerAddress(address);
+{	
+	targetDiv.innerHTML="";
+	var zip= document.getElementById('zipcode').value;
+	centerAddress(zip);
 	map.clearOverlays();
-	resultheader.innerHTML="";
-	getLocations(address);
-	
+	getLocations(zip);
 }
 
 function getLocations(zip)
@@ -120,8 +138,8 @@ function getLocations(zip)
 				}
 			}
 			displayListings(listings);
-		}
-	,{refreshInterval:0});	
+		},
+	{refreshInterval:0});	
 }
 
 function formatInfoWindow(location)
@@ -134,12 +152,12 @@ function formatInfoWindow(location)
 	var address = streetNum + " " + street + " " + city + " " + state + " " + zip;
 	var name = location.firstChild.nodeValue;
 	var numSpaces = 0;
-	var html = "<div>" + 
-		name + "<br>" +
-		streetNum + " " + street + ", " + "<br>" +
-		city + ", " + state + " " + zip + "<br><br>" +
-		"Handicap Parking Spaces: " + numSpaces +
-		"</div>";
+	var html = "<small><b>" + 
+		name + "</b><br>" +
+		streetNum + " " + street + ", " +
+		city + ", " + state + " " + zip + "<br/>" +
+		"<i>Handicap Parking Spaces: " + numSpaces +
+		"</i><br/></small>";
 	var returnResults= new Array();
 	returnResults[0] = address;
 	returnResults[1] = html;
@@ -150,33 +168,27 @@ function displayListings(listings)
 {
 	if(!listings || listings.length==0)
 	{
-		resultsheader.innerHTML = "Sorry, nothing found";
+		targetDiv += "<small><b>Sorry, nothing found</b></small>";
 	}
 	else
 	{
-		resultsheader.innerHTML += "Found " + listings.length + " results. <br><br>";
+		targetDiv.innerHTML += "<small><b>Found " + listings.length + " results.</b></small><br/><br/>";
 		for(var i = 0 ; i < listings.length ; i++)
 		{
 			var listing = formatInfoWindow(listings[i]);
-			resultsheader.innerHTML += listing[1] + "<br>";
+			targetDiv.innerHTML += listing[1] + "<br/>";
 		}
 	}
 }
+
+function changeCategory(value)
+{
+	selectedCategory=value;
+}
+
 </script>
 
 
 ]]>
 </Content>
 </Module>
-
-
-
-
-
-
-
-
-
-
-
-
