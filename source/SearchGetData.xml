@@ -54,12 +54,11 @@
 </form>
 </div>
 
-<div id="resultsheader" style="margin-bottom: 4px; margin-top: 4px;"></div>
-<div id="results"></div>
-<div id="resultsfooter" style="text-align: center;"></div>
+<div id="resultsheader"></div>
 
 <script>
 var map = new GMap2();
+var markers = [];
 var geocoder = new GClientGeocoder();
 var targetDiv = document.getElementById("resultsheader");
 var selectedCategory = "";
@@ -98,6 +97,7 @@ function markAddress(address, infoWindow)
 				icon.iconAnchor=new GPoint(14,40);
 				icon.shadowSize=new GSize(0, 0);
 				var marker = new GMarker(latlng, {icon:icon});
+				markers.push(marker);
 				map.addOverlay(marker);
 				GEvent.addListener(marker, "click",
 					function()
@@ -113,6 +113,7 @@ function markAddress(address, infoWindow)
 function doSearch()
 {
 	targetDiv.innerHTML="";
+	markers = [];
 	var zip= document.getElementById('zipcode').value;
 	centerAddress(zip);
 	map.clearOverlays();
@@ -153,7 +154,7 @@ function formatInfoWindow(location)
 	var name = location.firstChild.nodeValue;
 	var numSpaces = 0;
 	var html = "<small><b>" +
-		name + "</b><br>" +
+		name + "</b><br/>" +
 		streetNum + " " + street + ", " +
 		city + ", " + state + " " + zip + "<br/>" +
 		"<i>Handicap Parking Spaces: " + numSpaces +
@@ -177,12 +178,19 @@ function displayListings(listings)
 			for(var i = 0 ; i < listings.length ; i++)
 			{
 				var listing = formatInfoWindow(listings[i]);
-				targetDiv.innerHTML += listing[1] + "<br/>";
+				targetDiv.innerHTML += "<a href=\"#\" onclick=\"showInfoWindow(" +
+									   i + ", " + listing[1] + "); return false;\" >" +
+									   listing[1] + "</a><br/>";
 			}
 		}
 	} catch(error) {
 		alert("Error in displayListings: " + error);
 	}
+}
+
+function showInfoWindow(index, html)
+{
+	GEvent.trigger(markers[index], "click");
 }
 
 function changeCategory(value)
