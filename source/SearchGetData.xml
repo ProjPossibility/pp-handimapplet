@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Module>
 <ModulePrefs
-	title="Parking Search"
-	description="Displays a Hello World message in the left panel"
-	author="Your name"
+	title="HandiMap"
+	description="Displays information about handicap-accessible locations."
+	author="Project:Possibility"
 	author_email="your-email@gmail.com"
 	height="150">
 	<Require feature="sharedmap" />
@@ -12,7 +12,7 @@
 <Content type="html">
 <![CDATA[
 
-<b>Handicapped Parking Finder</b><br/>
+<b>HandiMap</b><br/>
 <small>
 by <a target="_blank" href="http://www.projectpossibility.org/">Project:Possibility</a>
 <br/><br/>
@@ -37,7 +37,7 @@ by <a target="_blank" href="http://www.projectpossibility.org/">Project:Possibil
 			</tr>
 			<tr>
 				<td>
-					<select id="category" name="category"onchange="changeCategory(this.value);">
+					<select id="category" name="category" onchange="changeCategory(this.value);">
 						<option value="" selected>Any</option>
 						<option value="Entertainment">Entertainment</option>
 						<option value="Food">Food</option>
