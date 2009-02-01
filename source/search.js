@@ -44,6 +44,7 @@
 <script>
 var map = new GMap2();
 var geocoder = new GClientGeocoder();
+var targetDiv = document.getElementById("resultsheader");
 
 function centerAddress(address) 
 {
@@ -96,7 +97,7 @@ function doSearch()
 	var address= document.getElementById('location').value;
 	centerAddress(address);
 	map.clearOverlays();
-	resultsheader.innerHTML="";
+	targetDiv.innerHTML="";
 	getLocations(address);
 	
 }
@@ -120,8 +121,8 @@ function getLocations(zip)
 				}
 			}
 			displayListings(listings);
-		}
-	,{refreshInterval:0});	
+		},
+	{refreshInterval:0});	
 }
 
 function formatInfoWindow(location)
@@ -134,12 +135,12 @@ function formatInfoWindow(location)
 	var address = streetNum + " " + street + " " + city + " " + state + " " + zip;
 	var name = location.firstChild.nodeValue;
 	var numSpaces = 0;
-	var html = "<div>" + 
-		name + "<br>" +
-		streetNum + " " + street + ", " + "<br>" +
-		city + ", " + state + " " + zip + "<br><br>" +
-		"Handicap Parking Spaces: " + numSpaces +
-		"</div>";
+	var html = "<small><b>" + 
+		name + "</b><br>" +
+		streetNum + " " + street + ", " +
+		city + ", " + state + " " + zip + "<br/>" +
+		"<i>Handicap Parking Spaces: " + numSpaces +
+		"</i><br/></small>";
 	var returnResults= new Array();
 	returnResults[0] = address;
 	returnResults[1] = html;
@@ -148,19 +149,17 @@ function formatInfoWindow(location)
 
 function displayListings(listings)
 {
-	var targetDiv = document.getElementById("resultsheader");
 	if(!listings || listings.length==0)
 	{
-		targetDiv += "Sorry, nothing found";
+		targetDiv += "<small><b>Sorry, nothing found</b></small>";
 	}
 	else
 	{
-		targetDiv.innerHTML += "Found " + listings.length + " results. <br><br>";
+		targetDiv.innerHTML += "<small><b>Found " + listings.length + " results.</b></small><br/><br/>";
 		for(var i = 0 ; i < listings.length ; i++)
 		{
 			var listing = formatInfoWindow(listings[i]);
-			alert(listing[1]);
-			targetDiv.innerHTML += listing[1] + "<br>";
+			targetDiv.innerHTML += listing[1] + "<br/>";
 		}
 	}
 }
@@ -170,15 +169,3 @@ function displayListings(listings)
 ]]>
 </Content>
 </Module>
-
-
-
-
-
-
-
-
-
-
-
-
