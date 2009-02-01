@@ -62,9 +62,13 @@ by <a target="_blank" href="http://www.projectpossibility.org/">Project:Possibil
 <script>
 var map = new GMap2();
 var markers = [];
+var allListings = [];
 var geocoder = new GClientGeocoder();
 var targetDiv = document.getElementById("resultsheader");
 var selectedCategory = "";
+var currentListing = 1;
+var totalResults = 0;
+var resultsPerPage = 2;
 
 function centerAddress(address)
 {
@@ -117,6 +121,7 @@ function doSearch()
 {
 	targetDiv.innerHTML="";
 	markers = [];
+	allListings = [];
 	var zip= document.getElementById('zipcode').value;
 	centerAddress(zip);
 	map.clearOverlays();
@@ -129,19 +134,19 @@ function getLocations(zip)
 	_IG_FetchXmlContent(url,
 		function(response)
 		{
-			var listings = [];
 			var locations = response.getElementsByTagName("location");
 			for(var i = 0 ; i < locations.length; i++)
 			{
 				var location = locations.item(i);
 				if(location.getAttribute("zip") == zip)
 				{
-					listings.push(location);
+					allListings.push(location);
 					var contents= formatInfoWindow(location);
 					markAddress(contents[0], contents[1]);
 				}
 			}
-			displayListings(listings);
+			displayListings(allListings.slice(currentListing - 1,
+							    currentListing + resultsPerPage - 1));
 		},
 	{refreshInterval:0});
 }
@@ -185,6 +190,16 @@ function displayListings(listings)
 				"<a href=\"#\" onclick=\"showInfoWindow(" + i + ", " +
 				listing[1] + "); return false;\" >" + listing[1] +
 				"</a><br/>";
+		}
+
+		if(listings.length < allListings.length)
+		{
+			var previous = "<a href=\"#\">previous</a>";
+			var next = "<a href=\"#\">next</a>";
+			targetDiv.innerHTML +=
+				"<small>" + previous + " Results: " + currentListing + "-" +
+				(currentListing + resultsPerPage - 1) + " of " +
+				allListings.length + " " + next + "</small>";
 		}
 	}
 }
