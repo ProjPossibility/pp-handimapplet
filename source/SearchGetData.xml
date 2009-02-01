@@ -37,6 +37,10 @@
 </form>
 </div>
 
+<div id="resultsheader" style="margin-bottom: 4px; margin-top: 4px;"></div>
+<div id="results"></div>
+<div id="resultsfooter" style="text-align: center;"></div>
+
 <script>
 var map = new GMap2();
 var geocoder = new GClientGeocoder();
@@ -58,7 +62,7 @@ function centerAddress(address)
 	);
 }
 
-function markAddress(address)
+function markAddress(address, infoWindow)
 {
 	geocoder.getLatLngAsync(address,    
 		function(latlng) 
@@ -71,7 +75,12 @@ function markAddress(address)
 			{
 				var marker = new GMarker(latlng);
 				map.addOverlay(marker);
-				marker.openInfoWindowHtml(address);
+				GEvent.addListener(marker, "click", 
+					function()
+					{
+						marker.openInfoWindowHtml(infoWindow);
+					}
+				);
 			}
 		}
 	);
@@ -81,6 +90,7 @@ function doSearch()
 {
 	var address= document.getElementById('location').value;
 	centerAddress(address);
+	map.clearOverlays();
 	getLocations(address);
 	
 }
@@ -91,25 +101,61 @@ function getLocations(zip)
 	_IG_FetchXmlContent(url,
 		function(response)
 		{
+			var listings = [];
 			var locations = response.getElementsByTagName("location");
 			for(var i = 0 ; i < locations.length; i++)
 			{
 				var location = locations.item(i);
-				alert(location.firstChild.nodeValue + " " + location.getAttribute("zip"));
 				if(location.getAttribute("zip") == zip)
 				{
-					var streetNum = location.getAttribute("streetNum");
-					var street = location.getAttribute("street");
-					var city= location.getAttribute("city");
-					var state = location.getAttribute("state");
-					var address = streetNum + " " + street + " " + city + " " + state + " " + zip;
-					markAddress(address);
+					listings.push(location);
+					var contents= formatInfoWindow(location);
+					markAddress(contents[0], contents[1]);
 				}
 			}
+			displayListings(listings);
 		}
-	);
+	,{refreshInterval:0});	
 }
 
+function formatInfoWindow(location)
+{
+	var zip = location.getAttribute("zip");
+	var streetNum = location.getAttribute("streetNum");
+	var street = location.getAttribute("street");
+	var city= location.getAttribute("city");
+	var state = location.getAttribute("state");
+	var address = streetNum + " " + street + " " + city + " " + state + " " + zip;
+	var name = location.firstChild.nodeValue;
+	var numSpaces = 0;
+	var html = "<div>" + 
+		name + "<br>" +
+		streetNum + " " + street + ", " + "<br>" +
+		city + ", " + state + " " + zip + "<br><br>" +
+		"Handicap Parking Spaces: " + numSpaces +
+		"</div>";
+	var returnResults= new Array();
+	returnResults[0] = address;
+	returnResults[1] = html;
+	return returnResults;
+}
+
+function displayListings(listings)
+{
+	if(!listings || listings.length==0)
+	{
+		resultsheader.innerHTML = "Sorry, nothing found";
+	}
+	else
+	{
+		resultsheader.innerHTML += "Found " + listings.length + " results. <br><br>";
+		for(var i = 0 ; i < listings.length ; i++)
+		{
+			var listing = formatInfoWindow(listings[i]);
+			resultsheader.innerHTML += listing[1] + "<br>";
+		}
+	}
+}
 </script>
 
 
