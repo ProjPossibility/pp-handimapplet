@@ -26,6 +26,15 @@ by <a target="_blank" href="http://www.projectpossibility.org/">Project:Possibil
 	</style>
 	<table border=0 cellspacing="0" cellpadding="0" class="headertable">
 		<tr class="headerrow">
+			<td colspan=3>Address <span style="color:gray">(number street, city, state)</span></td>
+		</tr>
+		<tr>
+			<td colspan=3>
+				<input id="address" name="address" value="" style="width: 280px"
+				       onkeypress="{if(event.keyCode == 13) { doSearch(); return false; }}"
+				/>
+			</td>
+		<tr class="headerrow">
 			<td>Zip Code</td>
 			<td>Category</td>
 		</tr>
@@ -74,7 +83,7 @@ function centerAddress(address)
 		{
 			if (!latlng)
 			{
-				alert("Please enter a valid zipcode.");
+				alert("Center: Please enter a valid zipcode.");
 			}
 			else
 			{
@@ -91,7 +100,7 @@ function markAddress(address, infoWindow)
 		{
 			if (!latlng)
 			{
-				alert("Please enter a valid zipcode.");
+				alert("Mark: Please enter a valid zipcode.");
 			}
 			else
 			{
@@ -120,18 +129,27 @@ function doSearch()
 	markers = [];
 	allListings = [];
 	currentListing = 1;
-	var zip= document.getElementById('zipcode').value;
+	var zip = document.getElementById('zipcode').value;
+	var address = document.getElementById('address').value;
+	var fullAddress = "zip";
+	if(address != "")
+		fullAddress = address + " " + zip;
 	centerAddress(zip);
 	map.clearOverlays();
-	getLocations(zip);
+	getLocations(zip, address);
 }
 
-function getLocations(zipcode)
+function getLocations(zipcode, address)
 {
 	var zip = zipcode.replace(/^\s+|\s+$/, '');
+
 	var query = "operation=search&zipcode=" + zip;
 	if(selectedCategory != "")
 		query += "&feature=" + selectedCategory;
+
+	if(address != "")
+		query += "&address=" + address.replace(/^\s+|\s+$/, '');
+
 	var url = "http://projectpossibility.org/projects/a11ymapplet/googlemappletT.php?";
 	_IG_FetchXmlContent(url + query,
 		function(response)
