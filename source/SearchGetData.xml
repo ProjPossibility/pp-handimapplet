@@ -76,14 +76,20 @@ var selectedCategory = "";
 var currentListing = 1;
 var resultsPerPage = 5;
 
-function centerAddress(address)
+/*****
+ *	method: centerAddress(zipcode)
+ *	params: zipcode: The zip code at which to center the map.
+ *
+ *	Centers the map at the specified zipcode.
+ **/
+function centerAddress(zipcode)
 {
-	geocoder.getLatLngAsync(address,
+	geocoder.getLatLngAsync(zipcode,
 		function(latlng)
 		{
 			if (!latlng)
 			{
-				alert("Center: Please enter a valid zipcode.");
+				alert("Please enter a valid zipcode.");
 			}
 			else
 			{
@@ -93,6 +99,13 @@ function centerAddress(address)
 	);
 }
 
+/*****
+ *	method: markAddress(address, infoWindow)
+ *	params: address: The address at which to place a marker on the map.
+ *          infoWindow: The HTML content of the marker's information window.
+ *
+ *	Adds a marker at the specified address to the map.
+ **/
 function markAddress(address, infoWindow)
 {
 	geocoder.getLatLngAsync(address,
@@ -100,7 +113,7 @@ function markAddress(address, infoWindow)
 		{
 			if (!latlng)
 			{
-				alert("Mark: Please enter a valid zipcode.");
+				alert("Please enter a valid zipcode.");
 			}
 			else
 			{
@@ -123,6 +136,14 @@ function markAddress(address, infoWindow)
 	);
 }
 
+/*****
+ *	method: doSearch()
+ *	params: N/A
+ *
+ *	Clears previously gathered data, and fetches the form data to communicate
+ *  with the server to search for the desired locations having information about
+ *  handicap accessibility.
+ **/
 function doSearch()
 {
 	targetDiv.innerHTML="";
@@ -139,6 +160,16 @@ function doSearch()
 	getLocations(zip, address);
 }
 
+
+/*****
+ *	method: getLocations(zipcode, address)
+ *	params: zipcode: The zip code at which to center the search.
+ *          address: The address at which to center the search.
+ *
+ *  Fetches the form data to communicate with the server to search for the
+ *  desired locations having information about handicap accessibility. The
+ *  gathered data is parsed as necessary.
+ **/
 function getLocations(zipcode, address)
 {
 	var zip = zipcode.replace(/^\s+|\s+$/, '');
@@ -170,6 +201,14 @@ function getLocations(zipcode, address)
 	{refreshInterval:0});
 }
 
+/*****
+ *	method: formatInfoWindow(location)
+ *	params: location: The location for which to format the information window's
+ *                    content (into HTML).
+ *
+ *  Formats the information window contents for the specified location into
+ *  HTML.
+ **/
 function formatInfoWindow(location)
 {
 	var zip = (location.getAttribute("zipcode") ?
@@ -204,6 +243,12 @@ function formatInfoWindow(location)
 	return returnResults;
 }
 
+/*****
+ *	method: displayListings(listings)
+ *	params: listings: The listings to display.
+ *
+ *  Displays the specified listings and marks their locations on the map.
+ **/
 function displayListings(listings)
 {
 	if(!listings || listings.length==0)
@@ -238,6 +283,12 @@ function displayListings(listings)
 	}
 }
 
+/*****
+ *	method: nextPage()
+ *	params: N/A
+ *
+ *  Callback when the "next" link is clicked on the listings pane (on the left).
+ **/
 function nextPage()
 {
 	currentListing += resultsPerPage;
@@ -247,6 +298,13 @@ function nextPage()
 								      currentListing-1 + resultsPerPage));
 }
 
+/*****
+ *	method: prevPage()
+ *	params: N/A
+ *
+ *  Callback when the "previous" link is clicked on the listings pane (on the
+ *  left).
+ **/
 function prevPage()
 {
 	currentListing -= resultsPerPage;
@@ -259,16 +317,36 @@ function prevPage()
 								      currentListing-1 + resultsPerPage));
 }
 
+/*****
+ *	method: canGoPrevious()
+ *	params: N/A
+ *
+ *  Determines whether or not we can click on the "previous" link.
+ **/
 function canGoPrevious()
 {
 	return currentListing > 1;
 }
 
+/*****
+ *	method: canGoNext()
+ *	params: N/A
+ *
+ *  Determines whether or not we can click on the "next" link.
+ **/
 function canGoNext()
 {
 	return (currentListing + resultsPerPage) <= allListings.length;
 }
 
+/*****
+ *	method: showInfoWindow(index, html)
+ *	params: index: The id of the marker whose information window to show.
+ *          html: The HTML contents of the information window.
+ *
+ *  Shows the information window for the marker associated with the specified
+ *  index, while populating it with the specified html.
+ **/
 function showInfoWindow(index, html)
 {
 	try {
@@ -278,6 +356,12 @@ function showInfoWindow(index, html)
 	}
 }
 
+/*****
+ *	method: changeCategory(value)
+ *	params: value: The value to set the currentCategory to
+ *
+ *  Sets the current category to the specified value.
+ **/
 function changeCategory(value)
 {
 	selectedCategory=value;
