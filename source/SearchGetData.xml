@@ -176,11 +176,11 @@ function formatInfoWindow(location)
 	var userInfo = location.getAttribute("info");
 	var extra = "<small><i>Ramp Accessiblity: " + hasRamp + "</i>" +
 	            (userInfo ? "<br/><br/>" + userInfo : "");
-	markAddress(address, html + extra);
 
 	var returnResults= new Array();
 	returnResults[0] = address;
 	returnResults[1] = html;
+	returnResults[2] = extra;
 	return returnResults;
 }
 
@@ -197,6 +197,7 @@ function displayListings(listings)
 		for(var i=0 ; i < listings.length; i++)
 		{
 			var listing = formatInfoWindow(listings[i]);
+			markAddress(listing[0], listing[1] + listing[2]);
 			targetDiv.innerHTML +=
 				"<a href=\"#\" onclick=\"showInfoWindow(" + i + ", " +
 				listing[1] + "); return false;\" >" + listing[1] +
