@@ -154,16 +154,18 @@ function getLocations(zipcode)
 
 function formatInfoWindow(location)
 {
-	var zip = location.getAttribute("zipcode");
-	var streetNum = location.getAttribute("streetnumber");
-	var street = location.getAttribute("street");
-	var city= location.getAttribute("city");
-	var state = location.getAttribute("state");
-	var address = (streetNum ? streetNum + " " : "") +
-			      (street ? street + ", " : "") +
-				  (city ? city + ", " : "") +
-				  (state ? state + " " : "") +
-				  (zip ? zip : "");
+	var zip = (location.getAttribute("zipcode") ?
+				location.getAttribute("zipcode") : "");
+	var streetNum = (location.getAttribute("streetnumber") ?
+				location.getAttribute("streetnumber") + " " : "");
+	var street = (location.getAttribute("street") ?
+				location.getAttribute("street") + ", " : "");
+	var city= (location.getAttribute("city") ?
+				location.getAttribute("city") + ", " : "");
+	var state = (location.getAttribute("state") ?
+				location.getAttribute("state") + " " : "");
+	var address = streetNum + street + city + state + zip;
+
 	var name = "";
 	if(location.firstChild)
 		name = "<b>" + location.firstChild.nodeValue + "</b><br/>";
@@ -199,9 +201,9 @@ function displayListings(listings)
 			var listing = formatInfoWindow(listings[i]);
 			markAddress(listing[0], listing[1] + listing[2]);
 			targetDiv.innerHTML +=
-				"<a href=\"#\" onclick=\"showInfoWindow(" + i + ", " +
-				listing[1] + "); return false;\" >" + listing[1] +
-				"</a><br/>";
+				"<a href=\"#\" onclick=\"showInfoWindow(" +
+				(currentListing + i - 1) + ", " + listing[1] +
+				"); return false;\" >" + listing[1] + "</a><br/>";
 		}
 
 		var previous = (canGoPrevious() ?
