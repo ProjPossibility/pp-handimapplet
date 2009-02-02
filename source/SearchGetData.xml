@@ -155,9 +155,16 @@ function doSearch()
 	var fullAddress = "zip";
 	if(address != "")
 		fullAddress = address + " " + zip;
-	centerAddress(zip);
-	map.clearOverlays();
-	getLocations(zip, address);
+	if(zip)
+	{
+		centerAddress(zip);
+		map.clearOverlays();
+		getLocations(zip, address);
+	}
+	else
+	{
+		alert("Please enter a valid zip code");
+	}
 }
 
 
