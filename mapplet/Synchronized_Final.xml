@@ -1,0 +1,1143 @@
+/**
+ * @author thuang513
+ */
+
+ 
+ <?xml version="1.0" encoding="UTF-8"?>
+
+<Module>
+
+<ModulePrefs
+
+	title="HandiMap"
+
+	description="Displays information about handicap-accessible locations."
+
+	author="Project:Possibility"
+
+	author_email="your-email@gmail.com"
+
+	height="150">
+
+	<Require feature="sharedmap" />
+
+</ModulePrefs>
+
+
+
+<Content type="html">
+
+<![CDATA[
+
+<script language="javascript">
+
+/* START OF JAVASCRIPT */
+
+var map = new GMap2();
+var storePoint = null;
+var theMarker = null;
+
+
+//Data
+
+var streetName = null;
+var streetNo =null;
+var postalCode = null;
+var state = null;
+var city = null;
+var country = null;
+
+var iconLink ="http://ss12.info/image/sponsor/logo_projpos_large.jpg"
+var projectPIcon = new GIcon(G_DEFAULT_ICON,iconLink);
+projectPIcon.iconSize = new GSize(25, 25);
+
+map.clearOverlays();
+     
+     
+GEvent.addListener(map, "click", function(marker, point) {
+  if (marker) {
+    map.removeOverlay(marker);
+  } else {
+    if (point) {
+		storePoint = point;
+		
+		if(theMarker !=null)
+		{
+			map.removeOverlay(theMarker);
+		}
+		theMarker = new GMarker(storePoint,{icon:projectPIcon,bouncy:true,bounceGravity:2});
+		
+		map.addOverlay(theMarker);
+		getAddress(storePoint);
+	}
+   
+  }});
+
+
+
+// Point is a GLatLng object
+function getAddress(point)
+{
+	try {
+	
+	
+		var _lat = point.lat();
+		var _long = point.lng();
+		var everything_url = "http://ws.geonames.org/findNearestAddressJSON?lat=" + _lat + "&lng=" + _long;
+		var postal_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?lat=" + _lat + "&lng=" + _long;
+		
+		// Fetch everything except for zip code.
+		_IG_FetchContent(everything_url, decipherData);
+		_IG_FetchContent(postal_url, decipherData);
+		
+	}catch(err){
+		alert("Error at getAddress(), description: "+err);
+	}
+
+
+}
+
+
+function showMarkerInfoWindow()
+{
+    try {
+	
+	
+		
+		if (theMarker == null) {
+			alert("Error description: Marker is null");
+		}
+		else {
+			var address = streetNo + " " + streetName + ", " + city + "," + state + "," + country + " " + postalCode;
+			theMarker.openInfoWindow(address);
+			
+			
+		}
+		
+	}catch(err){
+		alert("Error description: "+err.description);
+	}
+	
+
+
+
+}
+
+function decipherData(rawData)
+{
+	
+	
+	try{
+		
+
+	
+		var jsonData = eval('(' + rawData + ')');
+		
+		if (jsonData.address == null) {
+		
+			// Code for getting postal code
+			postalCode = jsonData.postalCodes[0].postalCode;
+			
+			
+		}
+		else {
+			streetName = jsonData.address.street;
+			streetNo = jsonData.address.streetNumber;
+			
+			state = jsonData.address.adminCode1;
+			city = jsonData.address.adminName2;
+			country = jsonData.address.countryCode;
+			
+		}
+		
+		 
+		if (theMarker != null && postalCode != null && streetNo != null) {
+			showMarkerInfoWindow();
+			updateForms();
+		}
+		
+			}catch(err){
+		alert("Error at decipherData, description: "+err)
+	}
+	
+}
+     
+	 
+     function updateForms()
+     {
+	 	try {
+		
+		
+			var form = document.getElementById("theForm");
+						
+			var _strNmb = document.getElementById("a_strNmb");
+			_strNmb.value = streetNo;
+			
+			var _street = document.getElementById("a_street");
+			_street.value = streetName;
+			
+			var _state = document.getElementById("a_state");
+			_state.value = state;
+			
+			var _city = document.getElementById("a_city");
+			_city.value = city;
+			
+			var _country = document.getElementById("a_country");
+			_country.value = country;
+			
+			var _zipCode = document.getElementById("a_zipcode");
+			_zipCode.value = postalCode;
+			
+			var updateAddressText = streetNo + " " + streetName + ", " + city + "," + state + "," + " " + postalCode;
+			document.getElementById("tempAddress").value = updateAddressText;
+		}catch(err)
+		{
+			alert("Error description: "+err.description);
+		}
+     
+     }
+     
+
+
+
+
+//Non mapplet functions
+function hidediv() {
+	if (document.getElementById) { // DOM3 = IE5, NS6
+		document.getElementById('addDiv').style.display ="none";
+	}
+	else {
+		if (document.layers) { // Netscape 4
+			document.hideShow.visibility = 'hidden';
+		}
+	else { // IE 4
+		document.all.hideShow.style.visibility = 'hidden';
+		}
+	}
+} 
+
+
+function parseData()
+{
+	
+	
+	var address = new String(document.getElementById("tempAddress").value);
+
+	var i = 0;
+	var streetNum ="";
+	
+	var isValid = true;
+	alert(address.charAt(i)+"  i="+i);
+	
+	// get the street number
+	for(var i=0; i<address.length && address.charAt(i)!=" "; i++)
+	{
+		streetNum+=address.charAt(i);			
+	}
+	
+	
+	
+	
+	//get the street name
+	var _streetName ="";
+	for(; i<address.length&&address.charAt(i)!=",";i++)
+	{
+		_streetName += address.charAt(i);
+	}
+	
+	
+	i++;
+	if(address.charAt(i)==" ") i++;
+	
+		//get the city name
+	var _cityName ="";
+	for(; i<address.length && address.charAt(i)!=",";i++)
+	{
+		_cityName += address.charAt(i);
+	}
+	
+	i++;
+	alert(address.charAt(i));
+	if(address.charAt(i)==" ") i++;
+	
+	//get the state name
+	var _stateName ="";
+	for(; i<address.length&&address.charAt(i)!=" ";i++)
+	{
+		_stateName += address.charAt(i);
+	}
+	
+	i++;
+	
+	//get the zipcode
+	var _zipcodeNumber ="";
+	for(; i<address.length;i++)
+	{
+		
+		_zipcodeNumber += address.charAt(i);
+	}
+	
+	streetNo = streetNum;
+	streetName = _streetName;
+	city = _cityName;
+	state = _stateName;
+	postalCode = _zipcodeNumber;
+	country = "US";
+	
+	
+	updateForms();
+}
+
+/** END OF ADD MAPPLET JAVASCRIPT**/
+</script>
+
+
+<!-- Dependencies for UI --> 
+	<!-- Sam Skin CSS for TabView --> 
+	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.6.0/build/tabview/assets/skins/sam/tabview.css"> 
+	 
+	<!-- JavaScript Dependencies for Tabview: --> 
+	<script type="text/javascript" src="http://yui.yahooapis.com/2.6.0/build/yahoo-dom-event/yahoo-dom-event.js"></script> 
+	<script type="text/javascript" src="http://yui.yahooapis.com/2.6.0/build/element/element-beta-min.js"></script> 
+	 
+	<!-- OPTIONAL: Connection (required for dynamic loading of data) --> 
+		<script type="text/javascript" src="http://yui.yahooapis.com/2.6.0/build/connection/connection-min.js"></script> 
+	 
+	<!-- Source file for TabView --> 
+	<script type="text/javascript" src="http://yui.yahooapis.com/2.6.0/build/tabview/tabview-min.js"></script> 
+
+
+
+
+
+
+<style type="text/css">
+<!--
+.tableStyle {
+	font-family: arial, sans-serif;
+	font-size: 10px;
+}
+.divStyle{
+	background-color: #e8ecf9;
+	padding: 3px;
+}
+-->
+</style>
+
+
+
+
+<b>HandiMap</b><br/>
+
+<small>
+
+by <a target="_blank" href="http://www.projectpossibility.org/">Project:Possibility</a>
+
+<br/><br/>
+
+</small>
+
+
+<script type="text/javascript"> 
+/* UI for tab view, using Yahoo YUI*/
+	var myTabs = new YAHOO.widget.TabView("container"); 
+</script>  
+
+<div id="container" class="yui-navset"> 
+	    <ul class="yui-nav"> 
+	        <li class="selected"><a href="#tab1"><em>Add</em></a></li> 
+	        <li><a href="#tab2"><em>Search</em></a></li> 
+	         
+	    </ul>             
+	    <div class="yui-content"> 
+
+<div id="addDiv" class="divStyle">
+
+<div id="addMappletContent">
+<form name="form" id="theForm" action="http://www.projectpossibility.org/projects/a11ymapplet/googlemappletT.php" method="post">
+    <input id="a_strNmb" name="streetnumber" type="hidden" value="">
+    <input id="a_street" name="street" type="hidden" value="">
+    <input id="a_state" name="state" type="hidden" value="">
+    <input id="a_city" name="city" type="hidden" value="">
+    <input id="a_country" name="country" type="hidden" value="">
+    <input id="a_zipcode" name="zipcode" type="hidden" value="">
+    
+    <input name="operation" type="hidden" value="add">
+  
+  <table width="350" border="0" class="tableStyle"> 
+  <tr>
+  <td width="138">Address:</td>
+  <td width="177"><input name="tempAddress"  type="text" id="tempAddress" size="15" onchange=parseData();> </td>
+  <tr>
+    <td width="138">Describe Me:</td>
+    <td width="138"><select name="feature" size="1" id="feature" onChange="MM_jumpMenu('parent',this,0)">
+      <option selected>Entertainment</option>
+      <option>Food</option>
+      <option>Government Facility</option>
+      <option>Medical</option>
+      <option>Office</option>
+      <option>Recreation</option>
+      <option>School</option>
+      <option>Shopping</option>
+      <option>Other</option>
+    </select></td>
+  </tr>
+  <tr>
+    <td>No. of Handicap Parking Spots </td>
+    <td><label>
+      <input name="parking" type="text" id="parking" size="5" maxlength="3">
+    </label></td>
+  </tr>
+  <tr>
+    <td>Has Accessibility Ramps</td>
+    <td><label>
+      <input type="checkbox" name="ramps" id="ramps">
+    </label></td>
+  </tr>
+  <tr>
+    <td>Additional Info</td>
+    <td><label>
+      <textarea name="info" cols="15" rows="5" wrap="soft" id="info"></textarea>
+    </label></td>
+  </tr>
+</table>
+<input name="submitButton" type="submit" value="Enter Info">
+</form>
+</div>
+
+</div> 
+
+<div id="searchMapplet">
+
+<div>
+
+<div style="background-color: #e5ecf9;">
+
+	<style>
+
+	.headertable{padding:0px 5px 5px 5px;width:300px;}
+
+	.headerrow{font-size:8pt;padding:0px 0px 0px 5px;}
+
+	.disabled{color:gray;}
+
+	</style>
+
+	<table border=0 cellspacing="0" cellpadding="0" class="headertable">
+
+		<tr class="headerrow">
+
+			<td colspan=3>Address <span style="color:gray">(number street, city, state)</span></td>
+
+		</tr>
+
+		<tr>
+
+			<td colspan=3>
+
+				<input id="address" name="address" value="" style="width: 280px"
+
+				       onkeypress="{if(event.keyCode == 13) { doSearch(); return false; }}"
+
+				/>
+
+			</td>
+
+		<tr class="headerrow">
+
+			<td>Zip Code</td>
+
+			<td>Category</td>
+
+		</tr>
+
+		<tr>
+
+			<td>
+
+				<input id="zipcode" name="zipcode" value="" style="width: 60px"
+
+				       onkeypress="{if(event.keyCode == 13) { doSearch(); return false; }}"
+
+				/>
+
+			</td>
+
+			<td>
+
+				<select id="category" name="category" onchange="changeCategory(this.value);">
+
+					<option value="" selected>Any</option>
+
+					<option value="Entertainment">Entertainment</option>
+
+					<option value="Food">Food</option>
+
+					<option value="Government Facility">Government Facilities</option>
+
+					<option value="Medical">Medical</option>
+
+					<option value="Office">Office</option>
+
+					<option value="Recreation">Recreation</option>
+
+					<option value="School">School</option>
+
+					<option value="Shopping">Shopping</option>
+
+					<option value="Other">Other</option>
+
+				</select>
+
+			</td>
+
+			<td>
+
+				<input type=button onclick="doSearch(); return false;" value="Search"/>
+
+			</td>
+
+		</tr>
+
+	</table>
+
+</div>
+
+<div id="resultsheader"></div>
+
+
+
+</div>
+</div>
+</div>
+
+
+
+
+
+<script language="javascript">
+
+var map = new GMap2();
+
+var markers = [];
+
+var allListings = [];
+
+var geocoder = new GClientGeocoder();
+
+var targetDiv = document.getElementById("resultsheader");
+
+var selectedCategory = "";
+
+var currentListing = 1;
+
+var resultsPerPage = 4;
+
+
+
+/*****
+
+ *	method: centerAddress(zipcode)
+
+ *	params: zipcode: The zip code at which to center the map.
+
+ *
+
+ *	Centers the map at the specified zipcode.
+
+ **/
+
+function centerAddress(zipcode)
+
+{
+
+	geocoder.getLatLngAsync(zipcode,
+
+		function(latlng)
+
+		{
+
+			if (!latlng)
+
+			{
+
+				alert("Please enter a valid zipcode.");
+
+			}
+
+			else
+
+			{
+
+				map.setCenter(latlng, 14);
+
+			}
+
+		}
+
+	);
+
+}
+
+
+
+/*****
+
+ *	method: markAddress(address, infoWindow)
+
+ *	params: address: The address at which to place a marker on the map.
+
+ *          infoWindow: The HTML content of the marker's information window.
+
+ *
+
+ *	Adds a marker at the specified address to the map.
+
+ **/
+
+function markAddress(address, infoWindow)
+
+{
+
+	geocoder.getLatLngAsync(address,
+
+		function(latlng)
+
+		{
+
+			if (!latlng)
+
+			{
+
+				alert("Please enter a valid zipcode.");
+
+			}
+
+			else
+
+			{
+
+				var markerimg = "http://ss12.info/image/sponsor/logo_projpos_large.jpg";
+
+				var icon = new GIcon(G_DEFAULT_ICON, markerimg);
+
+				icon.iconSize=new GSize(25,25);
+
+				icon.iconAnchor=new GPoint(14,40);
+
+				icon.shadowSize=new GSize(0, 0);
+
+				var marker = new GMarker(latlng, {icon:icon});
+
+				markers.push(marker);
+
+				map.addOverlay(marker);
+
+				GEvent.addListener(marker, "click",
+
+					function()
+
+					{
+
+						marker.openInfoWindowHtml(infoWindow);
+
+					}
+
+				);
+
+			}
+
+		}
+
+	);
+
+}
+
+
+
+/*****
+
+ *	method: doSearch()
+
+ *	params: N/A
+
+ *
+
+ *	Clears previously gathered data, and fetches the form data to communicate
+
+ *  with the server to search for the desired locations having information about
+
+ *  handicap accessibility.
+
+ **/
+
+function doSearch()
+
+{
+
+	targetDiv.innerHTML="";
+
+	markers = [];
+
+	allListings = [];
+
+	currentListing = 1;
+
+	var zip = document.getElementById('zipcode').value;
+
+	var address = document.getElementById('address').value;
+
+	var fullAddress = "zip";
+
+	if(address != "")
+
+		fullAddress = address + " " + zip;
+
+	if(zip)
+
+	{
+
+		centerAddress(zip);
+
+		map.clearOverlays();
+
+		getLocations(zip, address);
+
+	}
+
+	else
+
+	{
+
+		alert("Please enter a valid zip code");
+
+	}
+
+}
+
+
+
+
+
+/*****
+
+ *	method: getLocations(zipcode, address)
+
+ *	params: zipcode: The zip code at which to center the search.
+
+ *          address: The address at which to center the search.
+
+ *
+
+ *  Fetches the form data to communicate with the server to search for the
+
+ *  desired locations having information about handicap accessibility. The
+
+ *  gathered data is parsed as necessary.
+
+ **/
+
+function getLocations(zipcode, address)
+
+{
+
+	var zip = zipcode.replace(/^\s+|\s+$/, '');
+
+
+
+	var query = "operation=search&zipcode=" + zip;
+
+	if(selectedCategory != "")
+
+		query += "&feature=" + selectedCategory;
+
+
+
+	if(address != "")
+
+		query += "&address=" + address.replace(/^\s+|\s+$/, '');
+
+
+
+	var url = "http://projectpossibility.org/projects/a11ymapplet/googlemappletT.php?";
+
+	_IG_FetchXmlContent(url + query,
+
+		function(response)
+
+		{
+
+			if(response.getElementsByTagName("locations"))
+
+			{
+
+				var locations = response.getElementsByTagName("location");
+
+				for(var i=0; i < locations.length; i++)
+
+				{
+
+					var location = locations.item(i);
+
+					allListings.push(location);
+
+					var contents= formatInfoWindow(location);
+
+				}
+
+				displayListings(allListings.slice(currentListing - 1,
+
+				currentListing + resultsPerPage - 1));
+
+			}
+
+		},
+
+	{refreshInterval:0});
+
+}
+
+
+
+/*****
+
+ *	method: formatInfoWindow(location)
+
+ *	params: location: The location for which to format the information window's
+
+ *                    content (into HTML).
+
+ *
+
+ *  Formats the information window contents for the specified location into
+
+ *  HTML.
+
+ **/
+
+function formatInfoWindow(location)
+
+{
+
+	var zip = (location.getAttribute("zipcode") ?
+
+				location.getAttribute("zipcode") : "");
+
+	var streetNum = (location.getAttribute("streetnumber") ?
+
+				location.getAttribute("streetnumber") + " " : "");
+
+	var street = (location.getAttribute("street") ?
+
+				location.getAttribute("street") + ", " : "");
+
+	var city= (location.getAttribute("city") ?
+
+				location.getAttribute("city") + ", " : "");
+
+	var state = (location.getAttribute("state") ?
+
+				location.getAttribute("state") + " " : "");
+
+	var address = streetNum + street + city + state + zip;
+
+
+
+	var name = "";
+
+	if(location.firstChild)
+
+		name = "<b>" + location.firstChild.nodeValue + "</b><br/>";
+
+
+
+	var numSpaces = location.getAttribute("parking");
+
+	var html = "<small>" + name + address + "<br/>" +
+
+		"<i>Handicap Parking Spaces: " + numSpaces + "</i><br/></small>";
+
+
+
+	var hasRamp = (location.getAttribute("ramps") ? "Yes" : "No");
+
+	var userInfo = location.getAttribute("info");
+
+	var extra = "<small><i>Ramp Accessiblity: " + hasRamp + "</i>" +
+
+	            (userInfo ? "<br/><br/>" + userInfo : "");
+
+
+
+	var returnResults= new Array();
+
+	returnResults[0] = address;
+
+	returnResults[1] = html;
+
+	returnResults[2] = extra;
+
+	return returnResults;
+
+}
+
+
+
+/*****
+
+ *	method: displayListings(listings)
+
+ *	params: listings: The listings to display.
+
+ *
+
+ *  Displays the specified listings and marks their locations on the map.
+
+ **/
+
+function displayListings(listings)
+
+{
+
+	if(!listings || listings.length==0)
+
+	{
+
+		targetDiv.innerHTML += "<small><b>Sorry, nothing found.</b></small>";
+
+	}
+
+	else
+
+	{
+
+		targetDiv.innerHTML += "<small><b>Found " + allListings.length +
+
+							   " results.</b></small><br/><br/>";
+
+		for(var i=0 ; i < listings.length; i++)
+
+		{
+
+			var listing = formatInfoWindow(listings[i]);
+
+			markAddress(listing[0], listing[1] + listing[2]);
+
+			targetDiv.innerHTML +=
+
+				"<a href=\"#\" onclick=\"showInfoWindow(" +
+
+				(currentListing + i - 1) + ", " + listing[1] +
+
+				"); return false;\" >" + listing[1] + "</a><br/>";
+
+		}
+
+
+
+		var previous = (canGoPrevious() ?
+
+			'<a href="#" onclick="prevPage(); return false;">previous</a>' :
+
+			'<span class=disabled>previous</span>');
+
+		var next = (canGoNext() ?
+
+			'<a href="#" onclick="nextPage(); return false;">next</a>' :
+
+			'<span class=disabled>next</span>');
+
+
+
+		var ending = Math.min(currentListing + resultsPerPage - 1, allListings.length);
+
+		targetDiv.innerHTML +=
+
+			"<small>" + previous + " " + currentListing + "-" +
+
+			ending + " of " + allListings.length + " " + next + "</small>";
+
+	}
+
+}
+
+
+
+/*****
+
+ *	method: nextPage()
+
+ *	params: N/A
+
+ *
+
+ *  Callback when the "next" link is clicked on the listings pane (on the left).
+
+ **/
+
+function nextPage()
+
+{
+
+	currentListing += resultsPerPage;
+
+	map.clearOverlays();
+
+	targetDiv.innerHTML = "";
+
+	displayListings(allListings.slice(currentListing-1,
+
+								      currentListing-1 + resultsPerPage));
+
+}
+
+
+
+/*****
+
+ *	method: prevPage()
+
+ *	params: N/A
+
+ *
+
+ *  Callback when the "previous" link is clicked on the listings pane (on the
+
+ *  left).
+
+ **/
+
+function prevPage()
+
+{
+
+	currentListing -= resultsPerPage;
+
+	if(currentListing <= 0)
+
+		currentListing = 1;
+
+
+
+	map.clearOverlays();
+
+	targetDiv.innerHTML = "";
+
+	displayListings(allListings.slice(currentListing-1,
+
+								      currentListing-1 + resultsPerPage));
+
+}
+
+
+
+/*****
+
+ *	method: canGoPrevious()
+
+ *	params: N/A
+
+ *
+
+ *  Determines whether or not we can click on the "previous" link.
+
+ **/
+
+function canGoPrevious()
+
+{
+
+	return currentListing > 1;
+
+}
+
+
+
+/*****
+
+ *	method: canGoNext()
+
+ *	params: N/A
+
+ *
+
+ *  Determines whether or not we can click on the "next" link.
+
+ **/
+
+function canGoNext()
+
+{
+
+	return (currentListing + resultsPerPage) <= allListings.length;
+
+}
+
+
+
+/*****
+
+ *	method: showInfoWindow(index, html)
+
+ *	params: index: The id of the marker whose information window to show.
+
+ *          html: The HTML contents of the information window.
+
+ *
+
+ *  Shows the information window for the marker associated with the specified
+
+ *  index, while populating it with the specified html.
+
+ **/
+
+function showInfoWindow(index, html)
+
+{
+
+	try {
+
+		GEvent.trigger(markers[index], "click");
+
+	} catch(error) {
+
+		alert("Error in showInfoWindow(): " + error);
+
+	}
+
+}
+
+
+
+/*****
+
+ *	method: changeCategory(value)
+
+ *	params: value: The value to set the currentCategory to
+
+ *
+
+ *  Sets the current category to the specified value.
+
+ **/
+
+function changeCategory(value)
+
+{
+
+	selectedCategory=value;
+
+}
+
+</script>
+
+
+
+
+
+]]>
+
+</Content>
+
+</Module>
+
